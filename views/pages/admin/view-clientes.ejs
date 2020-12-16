@@ -1,0 +1,201 @@
+<div id="view-clientes">
+  <div class="m-4">
+    <table class="table">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Número de Cuenta</th>
+          <th scope="col">Cliente</th>
+          <th scope="col">Puntuacion</th>
+          <th scope="col">Mora</th>
+          <th scope="col">Refinanciacion</th>
+          <th scope="col"></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cuentas.forEach(function(cuenta) { %>
+          <tr>
+
+            <th scope="row">
+              <%=cuenta.id%>
+            </th>
+            <td>
+              <%=cuenta.n_cuenta%>
+            </td>
+            <td>
+              <%=cuenta.cliente.fullName%>
+            </td>
+            <td>
+              <%=cuenta.puntuacion%>
+            </td>
+            <!-- <td><%=cuenta.mora%></td>
+            <td><%=cuenta.refinanciacion%></td> -->
+            <% if (cuenta.mora==true) { %>
+              <td>Si</td>
+              <% } else {%>
+                <td>No</td>
+                <% } %>
+                  <% if (cuenta.refinanciacion==true) { %>
+                    <td>Si</td>
+                    <% } else {%>
+                      <td>No</td>
+                      <% } %>
+                        <td>
+                          <button class="btn btn-dark" @click='clickOpenEditarModalButton(),
+                          formData.nombre="<%=cuenta.cliente.fullName%>", 
+                          formData.email="<%=cuenta.cliente.emailAddress%>",
+                          formData.password="<%=cuenta.cliente.password%>",
+                          formData.cedula="<%=cuenta.cliente.cedula%>",
+                          formData.edad="<%=cuenta.cliente.edad%>",
+                          formData.trabajo="<%=cuenta.cliente.lugar_trabajo%>",
+                          formData.casa="<%=cuenta.cliente.dirrecion%>"'>Editar</button>
+                        </td>
+                        <td>
+                          <form action="/admin/cuentas/eliminar/<%= cuenta.id %>" method="POST">
+                            <input type="hidden" name="_method" value="delete">
+                            <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+                            <button class="btn btn-primary" type="submit">Delete</button>
+                          </form>
+                        </td>
+          </tr>
+          <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="m-4">
+    <button class="btn btn-dark" @click="clickOpenModalButton()">Agregar Cuenta</button>
+  </div>
+
+  <router-view></router-view>
+
+  <modal class="example-modal" v-if="modal==='abrir'" @close="closeExampleModal()" v-cloak>
+    <div class="modal-header">
+      <h2 class="modal-title">Crear Cuenta</h2>
+      <hr>
+    </div>
+    <div class="modal-body">
+      <ajax-form action="createCliente" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData"
+        :form-rules="formRules" :form-errors.sync="formErrors" @submitted="submittedForm()">
+        <!-- <form method="POST" action="/admin/cuentas"> -->
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" id="email" name="email"
+            :class="[formErrors.email ? 'is-invalid' : '']" v-model.trim="formData.email" autocomplete="email"
+            focus-first>
+          <div class="invalid-feedback" v-if="formErrors.descripcion">Please provide a non empty email.</div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password"
+            :class="[formErrors.password ? 'is-invalid' : '']" v-model.trim="formData.password" autocomplete="password">
+          <div class="invalid-feedback" v-if="formErrors.password">Please provide a non empty password.</div>
+        </div>
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre"
+            :class="[formErrors.nombre ? 'is-invalid' : '']" v-model.trim="formData.nombre" autocomplete="nombre">
+          <div class="invalid-feedback" v-if="formErrors.nombre">Please provide a non empty name.</div>
+        </div>
+        <div class="form-group">
+          <label for="cedula">Cedula</label>
+          <input type="number" class="form-control" id="cedula" name="cedula"
+            :class="[formErrors.cedula ? 'is-invalid' : '']" v-model.trim="formData.cedula" autocomplete="cedula">
+          <div class="invalid-feedback" v-if="formErrors.cedula">Please provide a non empty cedula or a number.</div>
+        </div>
+        <div class="form-group">
+          <label for="edad">Edad</label>
+          <input type="number" class="form-control" id="edad" name="edad" :class="[formErrors.edad ? 'is-invalid' : '']"
+            v-model.trim="formData.edad" autocomplete="edad">
+          <div class="invalid-feedback" v-if="formErrors.edad">Please provide a non empty age or a number.</div>
+        </div>
+        <div class="form-group">
+          <label for="trabajo">Dirreccion Trabajo</label>
+          <input type="text" class="form-control" id="trabajo" name="trabajo"
+            :class="[formErrors.trabajo ? 'is-invalid' : '']" v-model.trim="formData.trabajo" autocomplete="trabajo">
+          <div class="invalid-feedback" v-if="formErrors.trabajo">Please provide a non empty job.</div>
+        </div>
+        <div class="form-group">
+          <label for="casa">Dirreccion Casa</label>
+          <input type="text" class="form-control" id="casa" name="casa" :class="[formErrors.casa ? 'is-invalid' : '']"
+            v-model.trim="formData.casa" autocomplete="casa">
+          <div class="invalid-feedback" v-if="formErrors.casa">Please provide a non empty home.</div>
+        </div>
+        <cloud-error v-if="cloudError==='badParam'">The params are wrong.</cloud-error>
+        <cloud-error v-else-if="cloudError"></cloud-error>
+        <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+        <div class="form-group">
+          <!-- <button formmethod="POST" type="submit" class="btn btn-primary">Crear Cuenta</button> -->
+          <ajax-button :syncing="syncing" class="btn btn-primary">Crear Cuenta</ajax-button>
+        </div>
+        <!-- </form> -->
+      </ajax-form>
+    </div>
+  </modal>
+
+  <modal class="example-modal" v-if="editarModal==='abrir'" @close="closeExampleModal()" v-cloak>
+    <div class="modal-header">
+      <h2 class="modal-title">Editar Cuenta</h2>
+      <hr>
+    </div>
+    <div class="modal-body">
+      <ajax-form action="createCliente" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData"
+        :form-rules="formRules" :form-errors.sync="formErrors" @submitted="submittedForm()">
+        <!-- <form method="POST" action="/admin/cuentas"> -->
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" id="email" name="email"
+            :class="[formErrors.email ? 'is-invalid' : '']" v-model.trim="formData.email" autocomplete="email"
+            focus-first>
+          <div class="invalid-feedback" v-if="formErrors.descripcion">Please provide a non empty email.</div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password"
+            :class="[formErrors.password ? 'is-invalid' : '']" v-model.trim="formData.password" autocomplete="password">
+          <div class="invalid-feedback" v-if="formErrors.password">Please provide a non empty password.</div>
+        </div>
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre"
+            :class="[formErrors.nombre ? 'is-invalid' : '']" v-model.trim="formData.nombre" autocomplete="nombre">
+          <div class="invalid-feedback" v-if="formErrors.nombre">Please provide a non empty name.</div>
+        </div>
+        <div class="form-group">
+          <label for="cedula">Cedula</label>
+          <input type="number" class="form-control" id="cedula" name="cedula"
+            :class="[formErrors.cedula ? 'is-invalid' : '']" v-model.trim="formData.cedula" autocomplete="cedula">
+          <div class="invalid-feedback" v-if="formErrors.cedula">Please provide a non empty cedula or a number.</div>
+        </div>
+        <div class="form-group">
+          <label for="edad">Edad</label>
+          <input type="number" class="form-control" id="edad" name="edad"
+            :class="[formErrors.edad ? 'is-invalid' : '']" v-model.trim="formData.edad" autocomplete="edad">
+          <div class="invalid-feedback" v-if="formErrors.edad">Please provide a non empty age or a number.</div>
+        </div>
+        <div class="form-group">
+          <label for="trabajo">Dirreccion Trabajo</label>
+          <input type="text" class="form-control" id="trabajo" name="trabajo"
+            :class="[formErrors.trabajo ? 'is-invalid' : '']" v-model.trim="formData.trabajo" autocomplete="trabajo">
+          <div class="invalid-feedback" v-if="formErrors.trabajo">Please provide a non empty job.</div>
+        </div>
+        <div class="form-group">
+          <label for="casa">Dirreccion Casa</label>
+          <input type="text" class="form-control" id="casa" name="casa"
+            :class="[formErrors.casa ? 'is-invalid' : '']" v-model.trim="formData.casa" autocomplete="casa">
+          <div class="invalid-feedback" v-if="formErrors.casa">Please provide a non empty home.</div>
+        </div>
+        <cloud-error v-if="cloudError==='badParam'">The params are wrong.</cloud-error>
+        <cloud-error v-else-if="cloudError"></cloud-error>
+        <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+        <div class="form-group">
+          <!-- <button formmethod="POST" type="submit" class="btn btn-primary">Crear Cuenta</button> -->
+          <ajax-button :syncing="syncing" class="btn btn-primary">Editar Cuenta</ajax-button>
+        </div>
+        <!-- </form> -->
+      </ajax-form>
+    </div>
+  </modal>
+</div>
+
+<%- /* Expose locals as `window.SAILS_LOCALS` :: */ exposeLocalsToBrowser() %>

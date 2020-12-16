@@ -1,0 +1,34 @@
+<div id="view-solicitud" class="mt-5">
+    <div class="container card h-25 p-5">
+        <h5>Transaccion a solicitar diferido</h5>
+        <ajax-form action="solicitud" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData"
+            :form-rules="formRules" :form-errors.sync="formErrors" :success.sync="success" @submitted="submittedForm()">
+            <!-- <form method="POST" action="/admin/locales"> -->
+            <div class="form-group">
+                <label>Transaccion a solicitar</label>
+                <select class="form-control" name="transaccion" id="transaccion" :class="[formErrors.transaccion ? 'is-invalid' : '']"
+                v-model.trim="formData.transaccion">
+                    <option value="" selected disabled>Seleccionar transacción...</option>
+                    <% transacciones.forEach(function(transaccion) { %>
+                    <option value="<%=transaccion.id%>"><%=transaccion.n_transaccion%>  <%=transaccion.descripcion%></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cuotas a diferir</label>
+                <select class="form-control" name="cuotas" id="cuotas" :class="[formErrors.cuotas ? 'is-invalid' : '']"
+                v-model.trim="formData.cuotas">
+                    <option value="" selected disabled>Seleccionar cuota...</option>
+                    <option value="3">3</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+            <cloud-error v-if="cloudError==='empty'">Seleccione los campos</cloud-error>
+            <cloud-error v-else-if="cloudError"></cloud-error>
+            <div class="form-group">
+                <ajax-button :syncing="syncing" class="btn btn-primary">Solicitar diferido</ajax-button>
+            </div>
+        </ajax-form>
+    </div>
+</div>
+<%- /* Expose locals as `window.SAILS_LOCALS` :: */ exposeLocalsToBrowser() %>

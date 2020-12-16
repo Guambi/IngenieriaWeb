@@ -1,0 +1,28 @@
+<div class="m-4">
+    <table class="table">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">N° Transaccion</th>
+                <th scope="col">Local</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% transacciones.forEach(function(transaccion) { %>
+            <tr>
+                <td><%=transaccion.fecha%></td>
+                <td><%=transaccion.n_transaccion%></td>
+                <td><%=transaccion.local.nombre_establecimiento%></td>
+                <% if(transaccion.diferido == null) { %>
+                <td>Corriente</td>
+                <% } else { %>
+                <td>Diferido</td>
+                <% } %>
+                <td><%=transaccion.valor%></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

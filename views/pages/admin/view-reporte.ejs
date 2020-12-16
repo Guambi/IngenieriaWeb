@@ -1,0 +1,52 @@
+<div>
+   <div class="form-inline m-4">
+    <form action="/admin/reporte/" method="get">
+        <select class="form-control" name="clase" id="clase">
+            <option value="Todos">Todos</option>
+            <option value="corriente">Corriente</option>
+            <option value="diferido">Diferido</option>
+            <option value="mora">En Mora</option>
+            <option value="refinanciacion">En Refinanciacion</option>
+        </select>
+
+        <button type="submit" class="btn btn-dark">Buscar</button>
+    </form>
+   </div>
+
+    <div class="m-4">
+        <table class="table">
+          <thead class="table-dark">
+            <tr>
+                <th scope="col">N° Transaccion</th>
+                <th scope="col">Descripcion</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Pago</th>
+                <th scope="col">Local</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Disponible para diferido</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% transacciones.forEach(function(transaccion) { %>
+                <tr>
+                  <td scope="row"><%=transaccion.transaccion.n_transaccion%></td>
+                  <td><%=transaccion.transaccion.descripcion%></td>
+                  <td><%=transaccion.transaccion.valor%></td>
+                  <% if (transaccion.diferido != null) { %>
+                  <td>Diferido a <%=transaccion.transaccion.diferido.cuota%></td>
+                  <% } else {%>
+                  <td>Corriente</td>
+                  <% }%>
+                  <% if (transaccion.local != null) { %>
+                  <td><%=transaccion.transaccion.local.nombre_establecimiento%></td>
+                  <% } else {%>
+                  <td>Local Desasociado</td>
+                  <% }%>
+                  <td><%=transaccion.cliente.cliente.fullName%></td>
+                  <td><%=transaccion.validacion%></td>
+                </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+</div>

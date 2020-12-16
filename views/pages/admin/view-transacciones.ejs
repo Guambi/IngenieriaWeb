@@ -1,0 +1,124 @@
+<div id="view-transacciones">
+  <div class="m-4">
+    <table class="table">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">N° Transacciones</th>
+          <th scope="col">Descripcion</th>
+          <th scope="col">Valor</th>
+          <th scope="col">Pago</th>
+          <th scope="col">Local</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% transacciones.forEach(function(transaccion) { %>
+        <tr>
+          <th scope="row"><%=transaccion.id%></th>
+          <td><%=transaccion.n_transaccion%></td>
+          <td><%=transaccion.descripcion%></td>
+          <td><%=transaccion.valor%></td>
+          <% if (transaccion.diferido != null) { %>
+          <td><%=transaccion.diferido.cuota%></td>
+          <% } else {%>
+          <td>Corriente</td>
+          <% }%>
+          <% if (transaccion.local != null) { %>
+          <td><%=transaccion.local.nombre_establecimiento%></td>
+          <% } else {%>
+          <td>Desconocido</td>
+          <% }%>
+          <td><%=transaccion.fecha%></td>
+          <% if (transaccion.preautorizacion != null) { %>
+          <td>Preautorizacion</td>
+          <% } else if(transaccion.estado_movimiento != null) {%>
+          <td>Estado de Movimiento</td>
+          <% } else if (transaccion.estado_cuenta != null) {%>
+          <td>Estado de Cuenta</td>
+          <% } %>
+          <td>
+            <form action="/admin/transaccion/eliminar/<%= transaccion.id %>" method="POST">
+              <input type="hidden" name="_method" value="delete">
+              <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+              <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="m-4">
+    <button class="btn btn-dark" @click="clickOpenModalButton()">Agregar transaccion</button>
+  </div>
+
+  <router-view></router-view>
+
+  <modal class="example-modal" v-if="modal==='abrir'" @close="closeModal()" v-cloak>
+    <div class="modal-header">
+      <h2 class="modal-title">Agregar Transaccion</h2>
+      <hr>
+    </div>
+    <div class="modal-body">
+      <ajax-form action="createTransaccion" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData"
+        :form-rules="formRules" :form-errors.sync="formErrors" @submitted="submittedForm()">
+        <!-- <form method="POST" action="/admin/transaccion"> -->
+        <div class="form-group">
+          <label for="descripcion">Descripcion</label>
+          <input type="text" class="form-control" placeholder="Descripcion de la compra" id="descripcion"
+            name="descripcion" :class="[formErrors.descripcion ? 'is-invalid' : '']" v-model.trim="formData.descripcion"
+            autocomplete="descripcion" focus-first>
+          <div class="invalid-feedback" v-if="formErrors.descripcion">Please provide a non empty descripcion.</div>
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Valor</label>
+          <input type="text" class="form-control" placeholder="00.00" id="valor" name="valor"
+            :class="[formErrors.valor ? 'is-invalid' : '']" v-model.trim="formData.valor" autocomplete="valor">
+          <div class="invalid-feedback" v-if="formErrors.valor">Please provide a number.</div>
+        </div>
+        <div class="form-group">
+          <label for="tarjeta">Tarjeta Usada</label>
+          <input type="number" class="form-control" placeholder="1234567890" id="tarjeta" name="tarjeta"
+            :class="[formErrors.tarjeta ? 'is-invalid' : '']" v-model.trim="formData.tarjeta" autocomplete="tarjeta">
+          <div class="invalid-feedback" v-if="formErrors.tarjeta">Please provide a credit card number.</div>
+        </div>
+        <div class="form-group">
+          <label for="cuenta">Cuenta</label>
+          <select class="form-control" id="cuenta" name="cuenta" v-model="formData.cuenta">
+            <% movimientos.forEach(function(movimiento) { %>
+            <option value="<%= movimiento.id %>"><%=movimiento.cuenta.n_cuenta%></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="local">Local</label>
+          <select class="form-control" id="local" name="local" v-model="formData.local">
+            <% locales.forEach(function(local) { %>
+            <option value="<%= local.id %>"><%=local.nombre_establecimiento%></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cuota">Difedo</label>
+          <select class="form-control" id="cuota" name="cuota" v-model="formData.cuota">
+            <option value="0">Corriente</option>
+            <option value="3">3 Meses</option>
+            <option value="6">6 Meses</option>
+            <option value="12">12 Meses</option>
+          </select>
+        </div>
+        <cloud-error v-if="cloudError==='badParam'">The credentials you entered are not associated with an account.
+          Please check your email and/or password and try again.</cloud-error>
+        <cloud-error v-else-if="cloudError"></cloud-error>
+        <div class="form-group">
+          <ajax-button :syncing="syncing" class="btn btn-primary">Agregar Transaccion</ajax-button>
+        </div>
+        <!-- </form> -->
+      </ajax-form>
+    </div>
+  </modal>
+</div>
+<%- /* Expose locals as `window.SAILS_LOCALS` :: */ exposeLocalsToBrowser() %>

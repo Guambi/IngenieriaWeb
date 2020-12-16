@@ -1,0 +1,108 @@
+<div id="view-locales">
+    <div class="m-4">
+        <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre establecimiento</th>
+                    <th scope="col">Acepta diferidos</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <div class="locales" >
+                    <% locales.forEach(function(local) { %>
+                    <tr>
+                        <th scope="row"><%=local.id%></th>
+                        <td><%=local.nombre_establecimiento%></td>
+                        <% if (local.solo_corriente == true) { %>
+                        <td>No</td>
+                        <% } else { %>
+                        <td>Si</td>
+                        <% } %>
+                        <td>
+                            <button class="btn btn-dark" @click='clickOpenEditarModalButton(), formData.nombre="<%=local.nombre_establecimiento%>", 
+                                formData.corriente="<%=local.solo_corriente%>"'>Editar</button>
+                        </td>
+                        <td>
+                            <form action="/admin/locales/eliminar/<%= local.id %>" method="POST">
+                                <input type="hidden" name="_method" value="delete">
+                                <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+                                <button class="btn btn-primary" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </div>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="m-4">
+        <button class="btn btn-dark" @click="clickOpenModalButton()">Agregar local</button>
+    </div>
+
+    <router-view></router-view>
+
+    <modal class="example-modal" v-if="modal==='abrir'" @close="closeModal()" v-cloak>
+        <div class="modal-header">
+            <h2 class="modal-title">Agregar Local</h2>
+            <hr>
+        </div>
+        <div class="modal-body">
+            <ajax-form action="createLocal" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="submittedForm()">
+            <!-- <form method="POST" action="/admin/locales"> -->
+                <div class="form-group">
+                    <label for="nombre">Nombre del establecimiento</label>
+                    <input type="text" class="form-control" placeholder="Nombre del local" :class="[formErrors.name ? 'is-invalid' : '']" v-model.trim="formData.nombre" autocomplete="nombre" focus-first>
+                    <div class="invalid-feedback" v-if="formErrors.name">Please provide a non empty name and without numbers.</div>
+                </div>
+                <div class="form-group">
+                    <label for="tarjeta">Acepta Diferidos</label>
+                    <select class="form-control" id="corriente" name="corriente" v-model="formData.corriente">
+                        <option value="false">Si</option>
+                        <option value="true">No</option>
+                    </select>
+                </div>
+                <cloud-error v-if="cloudError==='badParam'">The credentials you entered are not associated with an account. Please check your email and/or password and try again.</cloud-error>
+                <cloud-error v-else-if="cloudError"></cloud-error>
+                <div class="form-group">
+                    <ajax-button :syncing="syncing" class="btn btn-primary">Agregar local</ajax-button>
+                </div>
+            </ajax-form>
+            <!-- </form> -->
+        </div>
+    </modal>
+
+    <modal class="example-modal" v-if="editarModal==='abrir'" @close="closeModal()" v-cloak>
+        <div class="modal-header">
+            <h2 class="modal-title">Editar Local</h2>
+            <hr>
+        </div>
+        <div class="modal-body">
+            <ajax-form action="editLocal" :syncing.sync="syncing" :cloud-error.sync="cloudError" :form-data="formData" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="submittedForm()">
+            <!-- <form method="POST" action="/admin/locales"> -->
+                <div class="form-group">
+                    <label for="nombre">Nombre del establecimiento</label>
+                    <input type="text" class="form-control" placeholder="Nombre del local" :class="[formErrors.name ? 'is-invalid' : '']" v-model.trim="formData.nombre" autocomplete="nombre" focus-first>
+                    <div class="invalid-feedback" v-if="formErrors.name">Please provide a non empty name and without numbers.</div>
+                </div>
+                <div class="form-group">
+                    <label for="tarjeta">Acepta Diferidos</label>
+                    <select class="form-control" id="corriente" name="corriente" v-model="formData.corriente">
+                        <option value="false">Si</option>
+                        <option value="true">No</option>
+                    </select>
+                </div>
+                <cloud-error v-if="cloudError==='badParam'">The credentials you entered are not associated with an account. Please check your email and/or password and try again.</cloud-error>
+                <cloud-error v-else-if="cloudError"></cloud-error>
+                <div class="form-group">
+                    <ajax-button :syncing="syncing" class="btn btn-primary">Editar local</ajax-button>
+                </div>
+            </ajax-form>
+            <!-- </form> -->
+        </div>
+    </modal>
+</div>
+<%- /* Expose locals as `window.SAILS_LOCALS` :: */ exposeLocalsToBrowser() %>

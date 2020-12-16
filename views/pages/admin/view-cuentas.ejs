@@ -1,0 +1,27 @@
+<div class="m-4">
+  <table class="table">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Número de Cuenta</th>
+          <th scope="col">Fecha Maxima de Pago</th>
+          <th scope="col">Cliente</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% cuentas.forEach(function(cuenta) { %>
+        <tr>
+         
+          <th scope="row"><%=cuenta.id%></th>
+          <td><%=cuenta.cuenta.n_cuenta%></td>
+          <td><%=cuenta.fecha_maximo_pago%></td>
+            <% clientes.forEach(function(cliente) { %>
+                <% if (cliente.id == cuenta.cuenta.id) { %>
+                    <td><%=cliente.cliente.fullName%></td> 
+                <% } %> 
+            <% }); %>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+</div>

@@ -1,0 +1,22 @@
+<div class="m-4">
+    <table class="table">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Transacción</th>
+            <th scope="col">Porcentaje Pagado</th>
+            <th scope="col">Valor Pagado</th>
+          </tr>
+        </thead>
+        <tbody>
+        <% pagos.forEach(function(pago) { %>
+          <tr>
+            <th scope="row"><%=pago.id%></th>
+            <td><%=pago.transaccion.n_transaccion%> <%=pago.transaccion.descripcion%></td>
+            <td><%=pago.porcentaje_pagado%>%</td>
+            <td>$<%=pago.valor_pagado%> de $<%=pago.transaccion.valor%></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+  </div>

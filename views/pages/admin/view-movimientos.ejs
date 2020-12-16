@@ -1,0 +1,26 @@
+<div class="m-4">
+    <table class="table">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Número de Cuenta</th>
+            <th scope="col">Fecha de corte</th>
+            <th scope="col">Cliente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% movimientos.forEach(function(movimiento) { %>
+          <tr>
+            <th scope="row"><%=movimiento.id%></th>
+            <td><%=movimiento.cuenta.n_cuenta%></td>
+            <td><%=movimiento.estado_de_corte%></td>
+                <% cuentas.forEach(function(cuenta) { %>
+                    <% if (cuenta.id == movimiento.cuenta.id) { %>
+                        <td><%=cuenta.cliente.fullName%></td> 
+                    <% } %> 
+                <% }); %>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+</div>
